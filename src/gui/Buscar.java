@@ -22,9 +22,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import concesionarioCoches.Modelo;
+import excepciones.MatriculaNoValidaException;
+
 import java.awt.Color;
+
 /**
  * Busca por Matricula un vehiculo del concesionario
+ * 
  * @author pablo
  *
  */
@@ -38,24 +42,24 @@ class Buscar extends VentanaGenerica {
 		rbAzul.setEnabled(false);
 		comboBoxMarca.setEnabled(false);
 		comboBoxModelo.setEnabled(false);
-		btBuscar.setVisible(false);	
+		btBuscar.setVisible(false);
 		botonGenerico.setVisible(true);
 		botonGenerico.setText("Buscar");
 		buttonNext.setVisible(false);
 		buttonPrevious.setVisible(false);
 		botonGenerico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Coche coche = Principal.miConcesionario.get(textField.getText());
-				if (coche != null) {
-					mostrarCoche(coche);					
-				} else {
-					JOptionPane.showMessageDialog(contentPanel,
-							"No existe ningun coche con esa matricula.", "Error",
-							JOptionPane.ERROR_MESSAGE);
+				Coche coche = null;
+				try {
+					coche = Principal.miConcesionario.get(textField.getText());
+					mostrarCoche(coche);
+				} catch (MatriculaNoValidaException e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 				}
+
 			}
 		});
-		
-	}
-			}
 
+	}
+}

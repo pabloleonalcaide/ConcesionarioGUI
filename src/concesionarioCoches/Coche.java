@@ -11,68 +11,80 @@ import excepciones.ModeloNoValidoException;
 
 /**
  * @author MariaLourdes
- * @version 2.0 
+ * @version 2.0
  * 
  */
 public class Coche implements Serializable {
 
-	private String matricula;	
+	private String matricula;
 	private Color color;
 	private Modelo modelo;
-	
-	static final private Pattern controlMatricula = Pattern
-			.compile("^\\d{4}[ -]?[a-zA-Z&&[^aeiouAEIOUÑQ]]{3}$");
 
-//Constructor privatizado, controlamos primero la matricula antes de crearlo
-	private Coche(String matricula, Color color, Modelo modelo) {
+	static final private Pattern controlMatricula = Pattern.compile("^\\d{4}[ -]?[a-zA-Z&&[^aeiouAEIOUÑQ]]{3}$");
+
+	// Constructor privatizado, controlamos primero la matricula antes de
+	// crearlo
+	Coche(String matricula, Color color, Modelo modelo)
+			throws MatriculaNoValidaException, ColorNoValidoException, ModeloNoValidoException {
 		setMatricula(matricula);
 		setColor(color);
 		setModelo(modelo);
 	}
 
-	private Coche(String matricula) {
+	private Coche(String matricula) throws MatriculaNoValidaException {
 		setMatricula(matricula);
 	}
+//
+//	static Coche instanciarCoche(String matricula, Color color, Modelo modelo)
+//			throws CocheNoValidoException, MatriculaNoValidaException, ColorNoValidoException, ModeloNoValidoException {
+//		if (matriculaValida(matricula) && color != null && modelo != null)
+//			return new Coche(matricula, color, modelo);
+//		else
+//			throw new CocheNoValidoException();
+//	}
 
-	static Coche instanciarCoche(String matricula, Color color, Modelo modelo) throws CocheNoValidoException {
-		if (matriculaValida(matricula) && color != null && modelo != null)
-			return new Coche(matricula, color, modelo);
-		else throw new CocheNoValidoException();
-	}
-
-	static Coche getInstance(String matricula) {
+	static Coche getInstance(String matricula) throws MatriculaNoValidaException {
 		if (matriculaValida(matricula))
 			return new Coche(matricula);
 		return null;
 	}
-	
+
 	public static boolean matriculaValida(String matricula) {
 		return controlMatricula.matcher(matricula).matches();
 	}
 
-	
-	private void setMatricula(String matricula) {
+	private void setMatricula(String matricula) throws MatriculaNoValidaException {
+		if (!matriculaValida(matricula))
+			throw new MatriculaNoValidaException("la matricula no es valida");
+
 		this.matricula = matricula;
 	}
+
 	public String getMatricula() {
 		return matricula;
 	}
 
-	private void setColor(Color color) {
+	private void setColor(Color color) throws ColorNoValidoException {
+		if (color == null)
+			throw new ColorNoValidoException("el color no es valido");
+
 		this.color = color;
 	}
 
-	private void setModelo(Modelo modelo) {
+	private void setModelo(Modelo modelo) throws ModeloNoValidoException {
+		if (modelo == null)
+			throw new ModeloNoValidoException("el modelo no es valido");
 		this.modelo = modelo;
 	}
+
 	public Modelo getModelo() {
 		return modelo;
 	}
+
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((matricula == null) ? 0 : matricula.hashCode());
+		result = prime * result + ((matricula == null) ? 0 : matricula.hashCode());
 		return result;
 	}
 
@@ -93,12 +105,10 @@ public class Coche implements Serializable {
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
-		return "\nCoche matricula: " + matricula + ", color: " + color
-				+ ", modelo: " + modelo;	
-}
+		return "\nCoche matricula: " + matricula + ", color: " + color + ", modelo: " + modelo;
+	}
 
 	public Color getColor() {
 		return this.color;

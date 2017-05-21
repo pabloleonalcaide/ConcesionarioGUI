@@ -5,6 +5,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 import concesionarioCoches.Modelo;
+import excepciones.CocheNoValidoException;
+import excepciones.ColorNoValidoException;
+import excepciones.MatriculaNoValidaException;
+import excepciones.ModeloNoValidoException;
 /**
  * 
  * @author pablo
@@ -19,13 +23,24 @@ public class VentanaAlta extends VentanaGenerica {
 			
 	botonGenerico.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
-		try {
-			Principal.miConcesionario.annadir(textField.getText(), getColor(), (Modelo) comboBoxModelo.getSelectedItem());
-						JOptionPane.showMessageDialog(contentPanel, "Coche a\u00f1adido con exito.");
-					Principal.miConcesionario.setModificado(true);
-		} catch (Exception e) {
-			mensajeError();
+		add();
 		}
+
+		private void add() {
+
+
+				try {
+					Principal.miConcesionario.annadir(textField.getText(), getColor(), (Modelo) comboBoxModelo.getSelectedItem());
+					JOptionPane.showMessageDialog(contentPanel, "Coche a\u00f1adido con exito.");
+					Principal.miConcesionario.setModificado(true);
+				} catch (CocheNoValidoException | MatriculaNoValidaException | ColorNoValidoException
+						| ModeloNoValidoException e) {
+					JOptionPane.showMessageDialog (null,e.getMessage(),"Error en las altas",JOptionPane.ERROR_MESSAGE);
+
+				}
+							
+
+
 		}
 		
 	});

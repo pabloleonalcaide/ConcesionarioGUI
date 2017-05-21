@@ -20,12 +20,16 @@ import concesionarioCoches.Coche;
 import concesionarioCoches.Color;
 import concesionarioCoches.Concesionario;
 import concesionarioCoches.Modelo;
+import excepciones.CocheNoExisteException;
+import excepciones.MatriculaNoValidaException;
+
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.awt.event.ItemEvent;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
 /**
  * 
  * @author pablo
@@ -45,31 +49,34 @@ public class VentanaBaja extends VentanaGenerica {
 		botonGenerico.setText("eliminar");
 		botonGenerico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Coche coche = Principal.miConcesionario.get(textField.getText());
-				if (coche != null) {
+				eliminar();
+			}
+
+			private void eliminar() {
+				Coche coche = null;
+				try {
+					coche = Principal.miConcesionario.get(textField.getText());
+					if (coche == null)
+						throw new CocheNoExisteException("el coche no existe");
 					mostrarCoche(coche);
-					int opcion = JOptionPane.showOptionDialog(contentPanel,
-							"Seguro?", "Eliminar?",
-							JOptionPane.YES_NO_CANCEL_OPTION,
-							JOptionPane.QUESTION_MESSAGE, null, null, null);
-					
-					switch (opcion) {
-					case JOptionPane.YES_OPTION:
+
+					if (JOptionPane.showOptionDialog(contentPanel, "Seguro?", "Eliminar?",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null,
+							null) == JOptionPane.YES_OPTION) {
+
 						Principal.miConcesionario.eliminar(textField.getText());
 						limpiarFormulario();
 						Principal.miConcesionario.setModificado(true);
 						JOptionPane.showMessageDialog(rootPane, "Eliminado con exito");
-						break;
+
 					}
-				} else {
-					JOptionPane.showMessageDialog(contentPanel,
-							"No se ha podido eliminar.", "Error",
-							JOptionPane.ERROR_MESSAGE);
-			}}
+				} catch (MatriculaNoValidaException | CocheNoExisteException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			}
 		});
 
-	
-			}
-	
-	
+	}
+
 }

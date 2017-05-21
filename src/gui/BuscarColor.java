@@ -93,8 +93,9 @@ class BuscarColor extends VentanaGenerica {
 		btBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			concesionarioColor = Principal.miConcesionario.getCochesColor((Color)comboBoxColor.getSelectedItem());
-			if (concesionarioColor.size()==0)JOptionPane.showMessageDialog(rootPane, "no hay coches de ese color");;
-			actualizarColor();
+			if (concesionarioColor.size()==0)
+				JOptionPane.showMessageDialog(rootPane, "no hay coches de ese color");;
+				actualizarColor();
 			}
 
 		});

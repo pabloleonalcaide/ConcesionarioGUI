@@ -33,6 +33,7 @@ public class Principal{
 	//Concesionario static para acceder desde las distintas ventanas, solo operamos simultaneamente con un concesionario.
 	public static Concesionario miConcesionario = new Concesionario();
 	Filtro filtro = new Filtro(".obj", "Objeto");
+	private JFileChooser fileChooser= new JFileChooser();
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -59,7 +60,7 @@ public class Principal{
 		frame.setBackground(Color.LIGHT_GRAY);
 		//icono que aparece al abrir la aplicacion.
 		frame.setIconImage(
-				Toolkit.getDefaultToolkit().getImage("C:\\Users\\d16lealp\\workspace\\Concesionario\\car.png"));
+				Toolkit.getDefaultToolkit().getImage("car.png"));
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -81,7 +82,7 @@ public class Principal{
 		JMenuItem mntmNuevoConc = new JMenuItem("Nuevo Concesionario");
 		mntmNuevoConc.setToolTipText("Nuevo");
 		mntmNuevoConc
-				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK));
 		mntmNuevoConc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				openNew();
@@ -172,12 +173,15 @@ public class Principal{
 		mntmBaja.setToolTipText("Eliminar Vehiculo");
 		mntmBaja.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (miConcesionario != null) {
+				if (miConcesionario.size()>0) {
 					VentanaBaja baja = new VentanaBaja();
 					baja.setVisible(true);
 				} else {
-					mensajeError();
-				}
+					try {
+						throw new ConcesionarioVacioException("el concesionario esta vacio");
+					} catch (ConcesionarioVacioException e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}				}
 			}
 		});
 		mntmBaja.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_MASK));
@@ -188,13 +192,17 @@ public class Principal{
 		mntmMostrar.setToolTipText("muestra los vehiculos almacenados");
 		mntmMostrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (miConcesionario.size()>0) {
+				if (!miConcesionario.isVacio()) {
 					Mostrar mostrar = new Mostrar();
 					mostrar.mostrarCoche(miConcesionario.get(0));
 					mostrar.comprobarLimites();
 					mostrar.setVisible(true);
 				} else {
-					mensajeError();
+					try {
+						throw new ConcesionarioVacioException("el concesionario esta vacio");
+					} catch (ConcesionarioVacioException e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -211,8 +219,12 @@ public class Principal{
 		mntmPorMatricula.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
 		mntmPorMatricula.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (miConcesionario == null || miConcesionario.isVacio()) {
-					mensajeError();
+				if (miConcesionario.isVacio()) {
+					try {
+						throw new ConcesionarioVacioException("el concesionario esta vacio");
+					} catch (ConcesionarioVacioException e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				} else {
 					Buscar buscar = new Buscar();
 					buscar.setVisible(true);
@@ -227,7 +239,11 @@ public class Principal{
 		mntmPorColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (miConcesionario.isVacio())
-					mensajeError();
+					try {
+						throw new ConcesionarioVacioException("el concesionario esta vacio");
+					} catch (ConcesionarioVacioException e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				else {
 					BuscarColor color = new BuscarColor();
 					color.setVisible(true);
@@ -270,14 +286,6 @@ public class Principal{
 	}
 
 	/**
-	 * Lanza un panel de advertencia si algo va mal
-	 */
-	private void mensajeError() {
-		JOptionPane.showMessageDialog(frame,
-				"      Accion no disponible\n " + "introduce vehiculos o abre un concesionario antes", "Que haces!",
-				JOptionPane.ERROR_MESSAGE);
-	}
-	/**
 	 * Abre un nuevo fichero, si ya estabamos manejando uno, pregunta si desea guardar
 	 */
 	protected void openNew() {
@@ -285,7 +293,7 @@ public class Principal{
 			Object[] options = { "SI", "NO", "CANCELAR" };
 			int respuesta = JOptionPane.showOptionDialog(null, "Desea guardar los cambios?", "Hay Cambios sin Guardar",
 					JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-			if (respuesta==0) {
+			if (respuesta==JOptionPane.YES_OPTION) {
 				saveAs();
 				Fichero.setFichero("Concesionario: Sin Titulo");
 				miConcesionario = new Concesionario();
@@ -342,12 +350,11 @@ public class Principal{
 	 * @throws IOException
 	 */
 	private void openFileChooser() throws FileNotFoundException, ClassNotFoundException, IOException {
-		JFileChooser open = new JFileChooser();
-		open.setAcceptAllFileFilterUsed(false);
-		open.addChoosableFileFilter(filtro);
-		if (open.showDialog(open, "Abrir Fichero") == JFileChooser.APPROVE_OPTION) {
-			Fichero.fichero = open.getSelectedFile();
-			miConcesionario = (Concesionario) Fichero.open(open.getSelectedFile());
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.addChoosableFileFilter(filtro);
+		if (fileChooser.showDialog(fileChooser, "Abrir Fichero") == JFileChooser.APPROVE_OPTION) {
+			Fichero.fichero = fileChooser.getSelectedFile();
+			miConcesionario = (Concesionario) Fichero.open(fileChooser.getSelectedFile());
 			frame.setTitle(Fichero.getFichero().getName());
 			miConcesionario.setModificado(false);
 	
@@ -375,20 +382,19 @@ public class Principal{
 	 * Metodo que permite guardar un fichero con la accion guardar como...
 	 */
 	protected void saveAs() {
-		JFileChooser saveAs = new JFileChooser();
-		saveAs.setAcceptAllFileFilterUsed(false);
-		saveAs.addChoosableFileFilter(filtro);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.addChoosableFileFilter(filtro);
 	
-		if (JFileChooser.APPROVE_OPTION == saveAs.showDialog(saveAs, "Guardar Archivo")) {
+		if (JFileChooser.APPROVE_OPTION == fileChooser.showDialog(fileChooser, "Guardar Archivo")) {
 	
-			saveAs.setAcceptAllFileFilterUsed(false);
-			Fichero.checkFile(saveAs.getSelectedFile());
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			Fichero.checkFile(fileChooser.getSelectedFile());
 			if (Fichero.getFichero().exists()) {
 				Object[] options = { "Si", "No" };
 				int option = JOptionPane.showOptionDialog(null, "El archivo indicado ya existe, Desea Sobreescribirlo?",
 						"Guardando", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options,
 						options[0]);
-				if (option == 0) {
+				if (option == JFileChooser.APPROVE_OPTION) {
 					try {
 						Fichero.saveAs(miConcesionario, Fichero.getFichero());
 					} catch (IOException ex) {

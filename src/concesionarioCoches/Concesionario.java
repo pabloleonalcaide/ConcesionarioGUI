@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import excepciones.CocheNoExisteException;
 import excepciones.CocheNoValidoException;
 import excepciones.CocheYaExisteException;
+import excepciones.ColorNoValidoException;
 import excepciones.MatriculaNoValidaException;
+import excepciones.ModeloNoValidoException;
 
 /*
  * No pueden existir dos coches con la misma matr�cula en el almac�n del concesinario
@@ -44,9 +46,12 @@ private boolean modificado = false;
 	 * @return true si el coche se a�ade, false en otro caso (el coche es null o
 	 *         el coche ya est� contenido en el almacen)
 	 * @throws CocheNoValidoException 
+	 * @throws ModeloNoValidoException 
+	 * @throws ColorNoValidoException 
+	 * @throws MatriculaNoValidaException 
 	 */
-	public boolean annadir(String matricula, Color color, Modelo modelo) throws CocheNoValidoException {
-		Coche coche = Coche.instanciarCoche(matricula, color, modelo);
+	public boolean annadir(String matricula, Color color, Modelo modelo) throws CocheNoValidoException, MatriculaNoValidaException, ColorNoValidoException, ModeloNoValidoException {
+		Coche coche = new Coche(matricula, color, modelo);
 		if (coche == null || almacen.contains(coche))
 			return false;
 		return almacen.add(coche);
@@ -59,8 +64,9 @@ private boolean modificado = false;
 	 *            Representa la matr�cula del coche a eliminar
 	 * @return true si el coche se elimina, false en otro caso (el coche no est�
 	 *         en el almacen)
+	 * @throws MatriculaNoValidaException 
 	 */
-	public boolean eliminar(String matricula) {
+	public boolean eliminar(String matricula) throws MatriculaNoValidaException {
 		return almacen.remove(Coche.getInstance(matricula));
 	}
 
@@ -79,8 +85,9 @@ private boolean modificado = false;
 	 * @param matricula
 	 *            Representa la matr�cula a buscar
 	 * @return Coche contenido en el almacen. null si no existe
+	 * @throws MatriculaNoValidaException 
 	 */
-	public Coche get(String matricula) {
+	public Coche get(String matricula) throws MatriculaNoValidaException {
 		Coche coche = Coche.getInstance(matricula);
 		int index = almacen.indexOf(coche);
 		if (index != -1) {

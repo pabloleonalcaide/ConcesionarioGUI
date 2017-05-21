@@ -36,7 +36,6 @@ import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 /**
- * 
  * @author pablo
  *
  */
@@ -80,15 +79,16 @@ public class VentanaGenerica extends JDialog {
 		textField.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
+				
+				textField.setText(textField.getText().toUpperCase());
 				if (!Coche.matriculaValida(textField.getText())) {
 					textField.setForeground(java.awt.Color.red);//si no es valida, se lo indicamos en rojo
-					textField.setText(textField.getText()+"   ERROR");
 				}
 			}
 			@Override
 			public void focusGained(FocusEvent arg0) {
 				textField.setForeground(java.awt.Color.black);
-				textField.setText("");//una vez regresa, vuelve a ponerse negro
+				//textField.setText("");//una vez regresa, vuelve a ponerse negro
 			}
 		});
 
@@ -122,11 +122,11 @@ public class VentanaGenerica extends JDialog {
 				comboBoxModelo.setModel(new DefaultComboBoxModel(getModelo(comboBoxMarca))); 
 			}
 		});
-		comboBoxMarca.setBounds(106, 95, 92, 22);
+		comboBoxMarca.setBounds(137, 92, 92, 22);
 		comboBoxModelo = new JComboBox<Modelo>();
-		comboBoxModelo.setBounds(106, 138, 92, 22);
+		comboBoxModelo.setBounds(137, 134, 92, 22);
 		lblModelo = new JLabel("Modelo");
-		lblModelo.setBounds(26, 142, 49, 14);
+		lblModelo.setBounds(26, 142, 65, 14);
 		botonGenerico = new JButton("");
 		lblModelo_1 = new JLabel("Modelo");
 		lblModelo_1.setBounds(26, 142, 49, 14);

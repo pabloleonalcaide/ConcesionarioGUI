@@ -12,8 +12,7 @@ import java.util.regex.Pattern;
  * @author pablo
  *
  */
-public class Fichero implements Serializable {
-
+public class Fichero {
 	private static final Pattern patron = Pattern.compile("^((\\w)+(\\.obj))$");
 	public static File fichero = new File("nuevoObjeto");
 
